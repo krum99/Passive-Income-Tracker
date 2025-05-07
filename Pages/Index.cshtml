@@ -4,9 +4,43 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <a href="/Account/Login">Login</a>
-    <a href="/Account/Register">Register</a>
+<style>
+    .button-link {
+        display: inline-block;
+        padding: 15px 30px;
+        margin: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .button-link:hover {
+        background-color: #0056b3;
+    }
+
+    .button-secondary {
+        background-color: #6c757d;
+    }
+
+    .button-secondary:hover {
+        background-color: #5a6268;
+    }
+    
+    .flex-dive {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+
+<div class="flex-div">
+    @* <h1 class="display-4">Welcome</h1> *@
+    <a href="/Account/Login" class="button-link display-4">Login</a>
+    <a href="/Account/Register" class="button-link display-4">Register</a>
     @* <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p> *@
 </div>
