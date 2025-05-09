@@ -1,0 +1,125 @@
+﻿@page
+@model PassiveMoneyTracker.Pages.Tools.LeasingCalculatorModel
+@{
+    ViewData["Title"] = "Leasing Calculator";
+}
+
+<div id="app" class="container mt-4">
+    <h2>Лизингов калкулатор</h2>
+    <form v-on:submit.prevent="calculate" class="card p-4">
+        <div class="mb-2">
+            <label>Цена на стоката:</label>
+            <input v-model.number="price" type="number" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>Първоначална вноска:</label>
+            <input v-model.number="downPayment" type="number" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>Срок (месеци):</label>
+            <input v-model.number="months" type="number" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>Месечна вноска:</label>
+            <input v-model.number="monthlyPayment" type="number" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>Такса за обработка:</label>
+            <input v-model.number="fee" type="number" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Изчисли</button>
+    </form>
+    
+    <div v-if="error" class="alert alert-danger mt-3">
+        {{ error }}
+    </div>
+
+    <div v-if="results" class="mt-4">
+        <h4>Резултати:</h4>
+        <p><strong>ГПР:</strong> {{ results.apr.toFixed(2) }}%</p>
+        <p><strong>Общо с такси:</strong> {{ results.totalWithFees }} BGN</p>
+        <p><strong>Такси:</strong> {{ results.totalFees }} BGN</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    price: null,
+                    downPayment: null,
+                    months: null,
+                    monthlyPayment: null,
+                    fee: null,
+                    results: null,
+                    error: null
+                };
+            },
+            methods: {
+                computeApr(P, D, F, M, n, tol = 1e-10, max_iter = 100) {
+                    function f(j) {
+                        let sum = 0;
+                        for (let t = 1; t <= n; t++) {
+                            sum += M / Math.pow(1 + j, t);
+                        }
+                        return D + F + sum - P;
+                    }
+
+                    let low = 0.0;
+                    let high = 1.0;
+
+                    if (f(low) * f(high) > 0) {
+                        throw new Error("Не може да се намери решение в интервала [0,1]");
+                    }
+
+                    let j = 0;
+
+                    for (let i = 0; i < max_iter; i++) {
+                        j = (low + high) / 2;
+                        if (f(low) * f(j) <= 0) {
+                            high = j;
+                        } else {
+                            low = j;
+                        }
+                        if (high - low < tol) {
+                            break;
+                        }
+                    }
+
+                    const apr_effective = (Math.pow(1 + j, 12) - 1) * 100;
+                    return apr_effective;
+                },
+
+                calculate() {
+                    this.error = null;
+
+                    try {
+                        const totalPaid = this.monthlyPayment * this.months + this.downPayment + this.fee;
+                        const totalFees = this.fee;
+                        const apr = this.computeApr(
+                            this.price,
+                            this.downPayment,
+                            this.fee,
+                            this.monthlyPayment,
+                            this.months
+                        );
+
+                        this.results = {
+                            totalWithFees: totalPaid.toFixed(2),
+                            totalFees: totalFees.toFixed(2),
+                            apr: apr
+                        };
+                    } catch (e) {
+                        this.results = null;
+                        this.error = e.message;
+                    }
+                }
+            }
+        });
+
+        app.mount('#app');
+    </script>
+}
+
