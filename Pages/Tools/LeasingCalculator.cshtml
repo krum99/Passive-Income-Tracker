@@ -9,19 +9,19 @@
     <form v-on:submit.prevent="calculate" class="card p-4">
         <div class="mb-2">
             <label>Цена на стоката:</label>
-            <input v-model.number="price" type="number" class="form-control" />
+            <input v-model.number="price" type="number" class="form-control" required min="0" />
         </div>
         <div class="mb-2">
             <label>Първоначална вноска:</label>
-            <input v-model.number="downPayment" type="number" class="form-control" />
+            <input v-model.number="downPayment" type="number" class="form-control" required min="0" />
         </div>
         <div class="mb-2">
             <label>Срок (месеци):</label>
-            <input v-model.number="months" type="number" class="form-control" />
+            <input v-model.number="months" type="number" class="form-control" required min="0" />
         </div>
         <div class="mb-2">
             <label>Месечна вноска:</label>
-            <input v-model.number="monthlyPayment" type="number" class="form-control" />
+            <input v-model.number="monthlyPayment" type="number" class="form-control" required min="0" />
         </div>
         <div class="mb-2">
             <label>Такса за обработка:</label>
@@ -71,7 +71,7 @@
                     let high = 1.0;
 
                     if (f(low) * f(high) > 0) {
-                        throw new Error("Не може да се намери решение в интервала [0,1]");
+                        throw new Error("Can't find solution in range [0,1]");
                     }
 
                     let j = 0;
