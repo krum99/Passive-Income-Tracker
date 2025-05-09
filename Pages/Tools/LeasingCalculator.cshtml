@@ -97,7 +97,7 @@
 
                     try {
                         const totalPaid = this.monthlyPayment * this.months + this.downPayment + this.fee;
-                        const totalFees = this.fee;
+                        const totalFees = this.fee ?? 0;
                         const apr = this.computeApr(
                             this.price,
                             this.downPayment,
