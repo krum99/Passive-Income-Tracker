@@ -44,7 +44,7 @@
         <h4>Резултати:</h4>
         <p><strong>ГПР:</strong> {{ results.apr.toFixed(2) }}%</p>
         <p><strong>Общо с такси:</strong> {{ results.totalWithFees }} BGN</p>
-        <p><strong>Такси:</strong> {{ results.totalFees }} BGN</p>
+        <p><strong>Такси:</strong> {{ results.totalFees == 0 ? 'NA' : results.totalFees + ' BGN' }}</p>
     </div>
 </div>
 
