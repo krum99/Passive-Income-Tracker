@@ -40,7 +40,7 @@
         {{ error }}
     </div>
 
-    <div v-if="results" class="mt-4">
+    <div v-if="results" class="mt-4 border border-primary rounded p-3" style="max-width: 500px;">
         <h4>Резултати:</h4>
         <p><strong>ГПР:</strong> {{ results.apr.toFixed(2) }}%</p>
         <p><strong>Общо с такси:</strong> {{ results.totalWithFees }} BGN</p>
