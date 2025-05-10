@@ -25,7 +25,13 @@
         </div>
         <div class="mb-2">
             <label>Такса за обработка:</label>
-            <input v-model.number="fee" type="number" class="form-control" />
+            <div class="input-group">
+                <input v-model.number="feeInput" type="number" class="form-control" min="0" />
+                <select v-model="feeType" class="form-select" style="max-width: 100px;">
+                    <option value="amount">лв</option>
+                    <option value="percent">%</option>
+                </select>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary w-50">Изчисли</button>
     </form>
@@ -52,7 +58,8 @@
                     downPayment: null,
                     months: null,
                     monthlyPayment: null,
-                    fee: null,
+                    feeInput: null,
+                    feeType: 'amount',
                     results: null,
                     error: null
                 };
@@ -96,19 +103,23 @@
                     this.error = null;
 
                     try {
-                        const totalPaid = this.monthlyPayment * this.months + this.downPayment + this.fee;
-                        const totalFees = this.fee ?? 0;
+                        const fee =
+                        this.feeType === 'amount'
+                                ? (this.feeInput ?? 0)
+                                : ((this.price ?? 0) * (this.feeInput ?? 0) / 100);
+                        const totalPaid = this.monthlyPayment * this.months + this.downPayment + fee;
+
                         const apr = this.computeApr(
                             this.price,
                             this.downPayment,
-                            this.fee,
+                            fee,
                             this.monthlyPayment,
                             this.months
                         );
 
                         this.results = {
                             totalWithFees: totalPaid.toFixed(2),
-                            totalFees: totalFees.toFixed(2),
+                            totalFees: fee.toFixed(2),
                             apr: apr
                         };
                     } catch (e) {
