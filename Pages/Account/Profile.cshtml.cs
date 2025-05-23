@@ -32,8 +32,7 @@ namespace PassiveMoneyTracker.Pages.Account
                 {
                     PassiveIncomeRecords = _context.PassiveIncomes
                         .Where(pi => pi.UserId == User.Id)
-                        .OrderByDescending(pi => pi.Year)
-                        .ThenByDescending(pi => pi.Month)
+                        .OrderByDescending(pi => pi.Date)
                         .ToList();
                 }
             }
