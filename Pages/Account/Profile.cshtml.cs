@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using PassiveMoneyTracker.Data;
 using PassiveMoneyTracker.Models;
 
@@ -15,6 +16,10 @@ namespace PassiveMoneyTracker.Pages.Account
         }
 
         public User User { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? SearchTerm { get; set; }
+
         public List<PassiveIncome> PassiveIncomeRecords { get; set; }
 
         [BindProperty]
@@ -40,6 +45,26 @@ namespace PassiveMoneyTracker.Pages.Account
             //{
             //    RedirectToPage("/Account/Login");
             //}
+        }
+
+        public async Task<IActionResult> OnPostSearchAsync()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (!userId.HasValue)
+                return RedirectToPage("/Account/Login");
+
+            User = await _context.Users.FindAsync(userId.Value);
+
+            var query = _context.PassiveIncomes.Where(pi => pi.UserId == User.Id);
+            
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+                query = query.Where(pi => pi.Source.Contains(SearchTerm));
+
+            PassiveIncomeRecords = await query
+                .OrderByDescending(pi => pi.Date)
+                .ToListAsync();
+
+            return Page();
         }
 
 
