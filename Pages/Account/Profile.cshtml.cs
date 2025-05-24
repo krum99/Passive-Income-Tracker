@@ -47,6 +47,17 @@ namespace PassiveMoneyTracker.Pages.Account
             //}
         }
 
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var income = await _context.PassiveIncomes.FindAsync(id);
+            if (income != null)
+            {
+                _context.PassiveIncomes.Remove(income);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToPage();
+        }
+
         public async Task<IActionResult> OnPostSearchAsync()
         {
             var userId = HttpContext.Session.GetInt32("UserId");

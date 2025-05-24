@@ -56,6 +56,18 @@
                                         <td>@record.Amount.ToString("F2")</td>
                                         <td>@record.Type</td>
                                         <td>@record.Source</td>
+                                        <td>
+                                            <form method="post"
+                                                  asp-page-handler="Delete"
+                                                  asp-route-id="@record.Id"
+                                                  onsubmit="return confirm('Are you sure you want to delete this record?');">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-danger"
+                                                        title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
