@@ -2,7 +2,7 @@
 @using PassiveMoneyTracker.Enums
 @model PassiveMoneyTracker.Pages.Account.ProfileModel
 @{
-    ViewData["Title"] = "Profile";
+    // ViewData["Title"] = "Profile";
 }
 
 <div class="container mt-5">
@@ -13,75 +13,127 @@
         </form>
     </div>
 
-        <!-- Passive Income History -->
-            <div class="card h-80">
-                <div class="card-header bg-primary text-white">
-                    Passive Income History
-                </div>
-                <form method="post" asp-page-handler="Search" class="mb-3 d-flex">
-                    <input asp-for="SearchTerm"
-                           class="form-control me-2"
-                           placeholder="Search..." />
-                    <button class="btn btn-outline-primary">Search</button>
-                </form>
-                <div class="card-body">
-                    <div style="max-height: 300px; overflow-y: auto;">
-                        <table class="table table-bordered table-striped text-center">
-                            <thead class="table-light">
+    @if (Model.EditIncome == null)
+    {
+        <div class="card h-80">
+            <div class="card-header bg-primary text-white">
+                Passive Income History
+            </div>
+            <form method="post" asp-page-handler="Search" class="mb-3 d-flex">
+                <input asp-for="SearchTerm"
+                       class="form-control me-2"
+                       placeholder="Search..." />
+                <button class="btn btn-outline-primary">Search</button>
+            </form>
+            <div class="card-body">
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-bordered table-striped text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Income</th>
+                                <th>Type</th>
+                                <th>Source</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.PassiveIncomeRecords)
+                            {
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Income</th>
-                                    <th>Type</th>
-                                    <th>Source</th>
+                                    <td style="display: flex; gap: 8px;">
+                                        <div style="
+                                            display:inline-block;
+                                            width:10px;
+                                            height:30px;
+                                            margin-right:5px;
+                                            background-color:@(record.Received == ReceivedStatus.Yes
+                                                ? "green"
+                                                : "red")">
+                                        </div>
+                                        @record.Date.ToString("dd MMM yyyy", System.Globalization.CultureInfo.InvariantCulture).ToUpper()
+                                    </td>
+                                    <td>@record.Amount.ToString("F2")</td>
+                                    <td>@record.Type</td>
+                                    <td>@record.Source</td>
+                                    <td>
+                                        <form method="post"
+                                              asp-page-handler="Delete"
+                                              asp-route-id="@record.Id"
+                                              onsubmit="return confirm('Are you sure you want to delete this record?');"
+                                              class="d-inline">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-danger"
+                                                    title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post"
+                                              asp-page-handler="Edit"
+                                              asp-route-id="@record.Id"
+                                              class="d-inline">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var record in Model.PassiveIncomeRecords)
-                                {
-                                    <tr>
-                                        <td style="display: flex; gap: 8px;"> @*FIX: This looks horrible on the front.*@
-                                            <div style="
-                                                display:inline-block;
-                                                width:10px;
-                                                height:30px;
-                                                margin-right:5px;
-                                                background-color:@(record.Received == ReceivedStatus.Yes
-                                                    ? "green"
-                                                    : "red")">
-                                            </div>
-                                            @(record.Date
-                                        .ToString("dd MMM yyyy", System.Globalization.CultureInfo.InvariantCulture)
-                                            .ToUpper())
-                                        </td>
-                                        <td>@record.Amount.ToString("F2")</td>
-                                        <td>@record.Type</td>
-                                        <td>@record.Source</td>
-                                        <td>
-                                            <form method="post"
-                                                  asp-page-handler="Delete"
-                                                  asp-route-id="@record.Id"
-                                                  onsubmit="return confirm('Are you sure you want to delete this record?');">
-                                                <button type="submit"
-                                                        class="btn btn-sm btn-danger"
-                                                        title="Delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+    }
 
-        <!-- Add New Income -->
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    Add New Income
-                </div>
-                <div class="card-body">
+    @if (Model.EditIncome != null)
+    {
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                Edit Income Record
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="SaveRecord">
+                    <input type="hidden" asp-for="EditIncome.Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="EditIncome.Date" class="form-label">Date</label>
+                        <input asp-for="EditIncome.Date" type="date" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="EditIncome.Amount" class="form-label">Amount</label>
+                        <input asp-for="EditIncome.Amount" type="number" step="0.01" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="EditIncome.Type" class="form-label">Type</label>
+                        <select asp-for="EditIncome.Type" class="form-select"
+                                asp-items="Html.GetEnumSelectList<Enums.IncomeType>()"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="EditIncome.Source" class="form-label">Source</label>
+                        <input asp-for="EditIncome.Source" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="EditIncome.Description" class="form-label">Description</label>
+                        <textarea asp-for="EditIncome.Description" class="form-control"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a asp-page="/Account/Profile" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+            Add New Income
+        </div>
+        <div class="card-body">
             <form method="post">
                 <div class="mb-3">
                     <label asp-for="NewIncome.Date" class="form-label">Date:</label>
@@ -115,34 +167,6 @@
                     <button type="submit" class="btn btn-success">Add Income</button>
                 </div>
             </form>
-
-                </div>
-            </div>
-
-        <!-- Statistics -->
-        @* <div class="col-md-4 mb-4"> *@
-        @*     <div class="card h-100"> *@
-        @*         <div class="card-header bg-info text-white"> *@
-        @*             Statistics *@
-        @*         </div> *@
-        @*         <div class="card-body d-flex flex-column justify-content-between"> *@
-        @*             <form method="post" class="mb-3 text-center"> *@
-        @*                 <button type="submit" asp-page-handler="CalculateAverage" class="btn btn-outline-primary"> *@
-        @*                     Calculate Average *@
-        @*                 </button> *@
-        @*             </form> *@
-
-        @*             @if (TempData["AverageIncome"] != null) *@
-        @*             { *@
-        @*                 <div class="alert alert-light text-center"> *@
-        @*                     <strong>Average income:</strong><br /> *@
-        @*                     @TempData["AverageIncome"] *@
-        @*                 </div> *@
-        @*             } *@
-        @*         </div> *@
-        @*     </div> *@
-        @* </div> *@
+        </div>
+    </div>
 </div>
-
-
-

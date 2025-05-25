@@ -25,6 +25,34 @@ namespace PassiveMoneyTracker.Pages.Account
         [BindProperty]
         public PassiveIncome NewIncome { get; set; }
 
+        [BindProperty]
+        public PassiveIncome EditIncome { get; set; }
+
+        public async Task<IActionResult> OnPostSaveRecordAsync()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            User = _context.Users.FirstOrDefault(u => u.Id == userId.Value);
+
+            // BUG: Something is causing the userId always to be '0',
+            // nonetheless its being set correctly in 'OnPostEditAsync' method.
+            EditIncome.UserId = userId ?? 0;
+
+            _context.PassiveIncomes.Update(EditIncome);
+            await _context.SaveChangesAsync();
+            //EditIncome = null;
+            return RedirectToPage();
+        }
+        public async Task<IActionResult> OnPostEditAsync(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            User = _context.Users.FirstOrDefault(u => u.Id == userId.Value);
+            EditIncome = await _context.PassiveIncomes.FindAsync(id);
+            if (EditIncome == null)
+                return RedirectToPage();
+            return Page();
+        }
+
+
         public void OnGet()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
