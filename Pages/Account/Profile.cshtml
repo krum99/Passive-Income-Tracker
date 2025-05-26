@@ -116,6 +116,13 @@
                         <input asp-for="EditIncome.Source" class="form-control" />
                     </div>
                     <div class="mb-3">
+                        <label asp-for="EditIncome.Received" class="form-label">Received</label>
+                        <select asp-for="EditIncome.Received" class="form-select"
+                                asp-items="Html.GetEnumSelectList<Enums.ReceivedStatus>()">
+                            <option value="">-- select --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label asp-for="EditIncome.Description" class="form-label">Description</label>
                         <textarea asp-for="EditIncome.Description" class="form-control"></textarea>
                     </div>
